@@ -9,7 +9,7 @@ function App() {
       <header className="App-header">
         
         <h1>Hello  from React </h1>
-        I am trying to set this up, but this is taking too long.
+        
         <Weather city="Abuja"/>
       </header>
     </div>

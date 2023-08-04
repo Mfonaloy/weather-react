@@ -1,26 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import  { ColorRing } from "react-loader-spinner";
+import Footer from "./Footer";
 
-export default function Weather(props) {
-    function handleResponse(response) {
-        alert(`The weather in ${response.data.name} is ${response.data.main.temp}°C`);
+
+export default function Weather() {
+    const [city, setCity] = useState("");
+    const [loaded, setLoaded] = useState(false);
+    const [weather, setWeather] = useState({});
+  
+    function displayWeather(response) {
+      setLoaded(true);
+      setWeather({
+        city: response.data.name,
+        temperature: response.data.main.temp,
+        description: response.data.weather[0].description,
+        wind: response.data.wind.speed,
+        humidity: response.data.main.humidity,
+        icon: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
+      });
     }
-    
-        let apiKey = "2ad3df86f01baa30d925420a827292df";
-        let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${props.city}&appid=${apiKey}&units=metric`;
-    
-    
-        axios.get(apiUrl).then(handleResponse); 
-return (
-    <ColorRing
-    visible={true}
-    height="80"
-    width="80"
-    ariaLabel="blocks-loading"
-    wrapperStyle={{}}
-    wrapperClass="blocks-wrapper"
-    colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
-  />
-);
-}
+  
+    function handleSubmit(event) {
+      event.preventDefault();
+      let apiKey = `2d96d64425dca1d6eda00d942a281c0d`;
+      let units = `metric`;
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
+      axios.get(url).then(displayWeather);
+    }
+  
+    function cityInput(event) {
+      setCity(event.target.value);
+    }
+  
+    let form = (
+      <form onSubmit={handleSubmit}>
+        <input type="text" placeholder="Enter a city" onChange={cityInput} />
+        <input type="submit" value="search" />
+      </form>
+    );
+  
+    if (loaded === true) {
+      return (
+        <div>
+          {form}
+          <br />
+          <div>
+            <strong>{weather.city}</strong>
+          </div>
+          <div>Temperature: {weather.temperature}°C</div>
+          <div>Description: {weather.description}</div>
+          <div>Humidity: {weather.humidity}%</div>
+          <div>Wind: {weather.wind} km/h</div>
+          <div>
+            <img src={weather.icon} alt="weather icon" />
+          </div>
+          <Footer />
+        </div>
+      );
+    } else {
+      return form;
+
+    }
+  }
